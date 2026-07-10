@@ -7,7 +7,9 @@ from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 
 # !! 판정 !!
-judgement = 0.90
+judgement = 0.95
+PINKY_JUDGEMENT = 0.03 # 소지 보정 값
+THUMB_JUDGEMENT = 0.03 # 엄지 보정 값
 
 
 # -------------------------------
@@ -170,7 +172,7 @@ while True:
 
             cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 255), -1)
                                                     
-            text = "One or more hands are detected"
+            text = "Two or more hands are detected"
 
             font = cv2.FONT_HERSHEY_SIMPLEX
             font_scale = 1
@@ -207,8 +209,8 @@ while True:
                 for i in range(5):
                     arg = i * 4
                     fsi_infos[i] = getFSI(hand[arg + 1], hand[arg + 2], hand[arg + 3], hand[arg + 4])
-                    fsi_infos[0] += 0.05
-                    fsi_infos[4] += 0.05 # 엄지 / 약지 보정
+                    fsi_infos[0] += THUMB_JUDGEMENT
+                    fsi_infos[4] += PINKY_JUDGEMENT # 엄지 / 약지 보정
                     is_ext[i] = fsi_infos[i] >= judgement
 
                 for finger, fsi, ext in zip(fingers, fsi_infos, is_ext):
