@@ -160,8 +160,8 @@ while True:
 
             height, width = frame.shape[:2]
 
-            box_w = 300
-            box_h = 100
+            box_w = 500
+            box_h = 60
 
             x1 = (width - box_w) // 2
             y1 = (height - box_h) // 2
@@ -170,11 +170,11 @@ while True:
 
             cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 255), -1)
                                                     
-            text = "HELLO"
+            text = "One or more hands are detected"
 
             font = cv2.FONT_HERSHEY_SIMPLEX
             font_scale = 1
-            thickness = 2
+            thickness = 1
 
             (text_w, text_h), baseline = cv2.getTextSize(
                 text, font, font_scale, thickness
