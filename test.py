@@ -6,6 +6,10 @@ from mediapipe.tasks.python.components.containers.landmark import NormalizedLand
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 
+# !! 판정 !!
+judgement = 0.90
+
+
 # -------------------------------
 # 모델 로드
 # -------------------------------
@@ -63,7 +67,7 @@ def normalize(v):
     )
 
 def is_extended(FSI_SCORE):
-    if FSI_SCORE > 0.90:
+    if FSI_SCORE > judgement:
         return True
     else:
         return False
@@ -154,6 +158,8 @@ while True:
         if len(result.hand_landmarks) > 1:
             print('현재 2개 이상의 손이 감지되었습니다 하나의 손만 감지시켜주세요!')
 
+            
+
         else:
             for i, hand in enumerate(result.hand_landmarks):
 
@@ -166,9 +172,9 @@ while True:
                 for i in range(5):
                     arg = i * 4
                     fsi_infos[i] = getFSI(hand[arg + 1], hand[arg + 2], hand[arg + 3], hand[arg + 4])
-                    fsi_infos[0] += 0.1
-                    fsi_infos[4] += 0.1 # 엄지 / 약지 보정
-                    is_ext[i] = fsi_infos[i] >= 0.98
+                    fsi_infos[0] += 0.05
+                    fsi_infos[4] += 0.05 # 엄지 / 약지 보정
+                    is_ext[i] = fsi_infos[i] >= judgement
 
                 for finger, fsi, ext in zip(fingers, fsi_infos, is_ext):
                     print(f"{finger:6} = {fsi:.4f} {ext}")
