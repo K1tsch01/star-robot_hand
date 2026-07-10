@@ -63,10 +63,10 @@ def normalize(v):
     )
 
 def is_extended(FSI_SCORE):
-    if FSI_SCORE < 0.98:
-        return False
-    else:
+    if FSI_SCORE > 0.98:
         return True
+    else:
+        return False
 
 def getFSI(
         p1: NormalizedLandmark,
@@ -165,13 +165,58 @@ while True:
 
                 for i in range(5):
                     arg = i * 4
-                    fsi_infos[i] = getFSI(arg + 1, arg + 2, arg + 3, arg + 4)
+                    fsi_infos[i] = getFSI(hand[arg + 1], hand[arg + 2], hand[arg + 3], hand[arg + 4])
+                    fsi_infos[0] += 0.01
+                    fsi_infos[4] += 0.01 # 엄지 / 약지 보정
                     is_ext[i] = fsi_infos[i] >= 0.98
 
                 for finger, fsi, ext in zip(fingers, fsi_infos, is_ext):
                     print(f"{finger:6} = {fsi:.4f} {ext}")
 
                 # for j, landmark in enumerate(hand): 손 마디 별 루프
+
+                # 인식 확인하기
+                lm_boxes = [4, 8, 12, 16, 20]
+                height, width = frame.shape[:2]
+                for lm in lm_boxes:
+                    x = int(hand[lm].x * width)
+                    y = int(hand[lm].y * height)
+                    j = 0
+                    color = [[0, 255, 0], [0, 0, 255]] # GREEN / RED
+
+                    res = ["EXTENDED", "BENT"]
+                    if is_ext[int((lm / 4) - 1)]:
+                        j = 0
+                    else:
+                        j = 1
+
+                    (text_w, text_h), baseline = cv2.getTextSize(
+                        res[j],
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        0.5,
+                        1
+                    )
+
+                    padding = 5
+
+                    # 박스 위치 (손가락 끝 위쪽)
+                    x1 = x - padding
+                    y1 = y - text_h - baseline - padding * 2
+                    x2 = x + text_w + padding
+                    y2 = y
+
+                    cv2.rectangle(frame, (x1, y1), (x2, y2), color[j], 2)
+                    cv2.putText(
+                        frame,
+                        res[j],
+                        (x, y - baseline - padding),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        0.5,
+                        color[j],
+                        1
+                    )
+
+
 
     cv2.imshow("Camera", frame)
 
