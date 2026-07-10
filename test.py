@@ -169,7 +169,7 @@ while True:
                     hand[9],
                     hand[10],
                     hand[11],
-                    hand[12]                
+                    hand[12]                    
                 )
                 ring = getFSI(
                     hand[13],
