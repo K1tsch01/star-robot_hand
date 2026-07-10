@@ -62,6 +62,11 @@ def normalize(v):
         v[2] / l
     )
 
+def is_extended(FSI_SCORE):
+    if FSI_SCORE < 0.98:
+        return False
+    else:
+        return True
 
 def getFSI(
         p1: NormalizedLandmark,
@@ -153,42 +158,18 @@ while True:
             for i, hand in enumerate(result.hand_landmarks):
 
                 print(f"\n손 {i}")
-                thumb = getFSI(
-                    hand[1],
-                    hand[2],
-                    hand[3],
-                    hand[4]                
-                )
-                index = getFSI(
-                    hand[5],
-                    hand[6],
-                    hand[7],
-                    hand[8]                
-                )
-                middle = getFSI(
-                    hand[9],
-                    hand[10],
-                    hand[11],
-                    hand[12]                    
-                )
-                ring = getFSI(
-                    hand[13],
-                    hand[14],
-                    hand[15],
-                    hand[16]                
-                )
-                pinky = getFSI(
-                    hand[17],
-                    hand[18],
-                    hand[19],
-                    hand[20]                
-                )
-    
-                print(f"Thumb = {thumb:.4f}")
-                print(f"Index = {index:.4f}")
-                print(f"Middle = {middle:.4f}")
-                print(f"Ring = {ring:.4f}")
-                print(f"Pinky = {pinky:.4f}")
+                
+                fingers = ["Thumb", "Index", "Middle", "Ring", "Pinky"]
+                fsi_infos = [0.0] * 5
+                is_ext = [False] * 5
+
+                for i in range(5):
+                    arg = i * 4
+                    fsi_infos[i] = getFSI(arg + 1, arg + 2, arg + 3, arg + 4)
+                    is_ext[i] = fsi_infos[i] >= 0.98
+
+                for finger, fsi, ext in zip(fingers, fsi_infos, is_ext):
+                    print(f"{finger:6} = {fsi:.4f} {ext}")
 
                 # for j, landmark in enumerate(hand): 손 마디 별 루프
 
