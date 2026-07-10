@@ -158,7 +158,42 @@ while True:
         if len(result.hand_landmarks) > 1:
             print('현재 2개 이상의 손이 감지되었습니다 하나의 손만 감지시켜주세요!')
 
-            
+            height, width = frame.shape[:2]
+
+            box_w = 300
+            box_h = 100
+
+            x1 = (width - box_w) // 2
+            y1 = (height - box_h) // 2
+            x2 = x1 + box_w
+            y2 = y1 + box_h
+
+            cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 255), -1)
+                                                    
+            text = "HELLO"
+
+            font = cv2.FONT_HERSHEY_SIMPLEX
+            font_scale = 1
+            thickness = 2
+
+            (text_w, text_h), baseline = cv2.getTextSize(
+                text, font, font_scale, thickness
+            )
+
+            text_x = x1 + (box_w - text_w) // 2
+            text_y = y1 + (box_h + text_h) // 2
+
+            cv2.putText(
+                frame,
+                text,
+                (text_x, text_y),
+                font,
+                font_scale,
+                (255, 255, 255),
+                thickness,
+                cv2.LINE_AA
+            )
+                        
 
         else:
             for i, hand in enumerate(result.hand_landmarks):
