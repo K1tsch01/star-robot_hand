@@ -179,7 +179,7 @@ while True:
         else:
             for i, hand in enumerate(result.hand_landmarks):
 
-                print(f"\n손 {i}")
+                # print(f"\n손 {i}")
                 
                 fingers = ["Thumb", "Index", "Middle", "Ring", "Pinky"]
                 fsi_infos = [0.0] * 5
