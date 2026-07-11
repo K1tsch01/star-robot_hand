@@ -197,9 +197,9 @@ while True:
 
                 for iex in is_ext:
                     if iex:
-                        print("")
+                        print("■", end="")
                     else:
-                        print("")
+                        print("□", end="")
 
                 # for j, landmark in enumerate(hand): 손 마디 별 루프
 
