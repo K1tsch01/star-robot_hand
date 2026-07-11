@@ -12,10 +12,8 @@ PINKY_JUDGEMENT = 0.03 # 소지 보정 값
 THUMB_JUDGEMENT = 0.03 # 엄지 보정 값
 
 
-# -------------------------------
-# 모델 로드
-# -------------------------------
 
+# 모델 로드
 base_options = python.BaseOptions(
     model_asset_path="hand_landmarker.task"
 )
@@ -27,10 +25,7 @@ options = vision.HandLandmarkerOptions(
 
 detector = vision.HandLandmarker.create_from_options(options)
 
-# -------------------------------
 # 웹캠
-# -------------------------------
-
 cap = cv2.VideoCapture(0)
 
 if not cap.isOpened():
@@ -39,7 +34,7 @@ if not cap.isOpened():
 
 print("ESC를 누르면 종료됩니다.")
 
-
+# 손가락 판별
 def dot(v1, v2):
     return (
         v1[0] * v2[0] +
@@ -81,10 +76,7 @@ def getFSI(
         p4: NormalizedLandmark
 ):
 
-    # ------------------------
-    # 벡터 생성
-    # ------------------------
-
+    # 벡터 계산
     vec1 = (
         p2.x - p1.x,
         p2.y - p1.y,
@@ -103,26 +95,18 @@ def getFSI(
         p4.z - p3.z
     )
 
-    # ------------------------
     # 정규화
-    # ------------------------
-
     vec1 = normalize(vec1)
     vec2 = normalize(vec2)
     vec3 = normalize(vec3)
 
-    # ------------------------
     # 방향 유사도 계산
-    # ------------------------
-
     score12 = dot(vec1, vec2)
     score23 = dot(vec2, vec3)
     score13 = dot(vec1, vec3)
 
-    # ------------------------
-    # 평균 점수
-    # ------------------------
 
+    # 평균 점수
     score = (
         score12 +
         score23 +
@@ -131,12 +115,7 @@ def getFSI(
 
     return score
 
-
-
-# -------------------------------
 # 메인 루프
-# -------------------------------
-
 while True:
 
     ret, frame = cap.read()
@@ -216,9 +195,15 @@ while True:
                 for finger, fsi, ext in zip(fingers, fsi_infos, is_ext):
                     print(f"{finger:6} = {fsi:.4f} {ext}")
 
+                for iex in is_ext:
+                    if iex:
+                        print("")
+                    else:
+                        print("")
+
                 # for j, landmark in enumerate(hand): 손 마디 별 루프
 
-                # 인식 확인하기
+                # 인식 확인하기용 카메라에 등장하는 박스
                 lm_boxes = [4, 8, 12, 16, 20]
                 height, width = frame.shape[:2]
                 for lm in lm_boxes:
