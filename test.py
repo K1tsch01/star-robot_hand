@@ -1,6 +1,7 @@
 import cv2
 import mediapipe as mp
 import math
+import serial
 
 from mediapipe.tasks.python.components.containers.landmark import NormalizedLandmark
 from mediapipe.tasks import python
@@ -115,6 +116,21 @@ def getFSI(
 
     return score
 
+# 아두이노 통신
+ser = serial.Serial("COM9", 9600)
+def send(arr: list[bool]):
+    DATA = ""
+    if len(arr) != 5:
+        print("아두이노 통신 함수 오류")
+        exit(0)
+    else:
+        for ar in arr:
+            if ar:
+                DATA += "1"
+            else:
+                DATA += "0"
+        ser.write((DATA + "\n").encode())
+
 # 메인 루프
 while True:
 
@@ -200,6 +216,9 @@ while True:
                         print("■", end="")
                     else:
                         print("□", end="")
+
+                # 아두이노 전송
+                send(is_ext)
 
                 # for j, landmark in enumerate(hand): 손 마디 별 루프
 
