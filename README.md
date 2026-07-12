@@ -1,5 +1,5 @@
 # 로봇 손 소프트웨어
--#  Copyright ⓒ 2026 저작권자. All Rights Reserved.
+Made by STAR, 2026
 
 ## 1. 다운로드
 
