@@ -56,6 +56,8 @@ cv2.VideoCapture(0)
 
 처럼 변경해 보세요.
 
+> **참고**: `Ctrl + F` 를 이용해 위 코드가 사용된 부분을 쉽게 찾아보세요!
+
 ---
 
 ## 6. 아두이노 핀 설정
@@ -69,10 +71,10 @@ cv2.VideoCapture(0)
 Visual Studio Code에서
 
 ```bash
-python test.py
+python main.py
 ```
 
-또는 `test.py`를 실행하면 됩니다.
+또는 `main.py`를 열고 오른쪽 위 버튼을 눌러 실행하면 됩니다.
 
 ---
 
