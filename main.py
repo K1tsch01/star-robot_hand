@@ -8,9 +8,19 @@ from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 
 # !! 판정 !!
-judgement = 0.95
+judgement = 0.925
 PINKY_JUDGEMENT = 0.03 # 소지 보정 값 (x5)
 THUMB_JUDGEMENT = 0.03 # 엄지 보정 값 (x5)
+
+# 상수들
+FINGERS = ("Thumb", "Index", "Middle", "Ring", "Pinky")
+LM_BOXES = (4, 8, 12, 16, 20)
+RESULT_TEXT = ("EXTENDED", "BENT")
+COLORS = (
+    (0, 255, 0),
+    (0, 0, 255)
+)
+DEBUG_MODE = False
 
 # 모델 로드
 base_options = python.BaseOptions(
@@ -19,7 +29,7 @@ base_options = python.BaseOptions(
 
 options = vision.HandLandmarkerOptions(
     base_options=base_options,
-    num_hands=10
+    num_hands=2 
 )
 
 detector = vision.HandLandmarker.create_from_options(options)
@@ -118,21 +128,16 @@ def getFSI(
 try:
     ser = serial.Serial("COM9", 9600)
     IS_CONNECTED = True
-except:
+except Exception:
     IS_CONNECTED = False
     print("아두이노 연결에 실패했습니다. 포트를 확인해주세요.\n카메라 모드로 전환됩니다.")
     
-def send(arr: list[bool]):
-    DATA = ""
+def send_finger_data(arr: list[bool]):
     if len(arr) != 5:
         print("아두이노 통신 함수 오류")
         exit(0)
     else:
-        for ar in arr:
-            if ar:
-                DATA += "1"
-            else:
-                DATA += "0"
+        DATA = "".join("1" if ar else "0" for ar in arr)
         ser.write((DATA + "\n").encode())
 
 # 메인 루프
@@ -197,11 +202,10 @@ while True:
                         
 
         else:
-            for i, hand in enumerate(result.hand_landmarks):
+            for hand in result.hand_landmarks:
 
                 # print(f"\n손 {i}")
                 
-                fingers = ["Thumb", "Index", "Middle", "Ring", "Pinky"]
                 fsi_infos = [0.0] * 5
                 is_ext = [False] * 5
 
@@ -212,8 +216,9 @@ while True:
                     fsi_infos[4] += PINKY_JUDGEMENT # 엄지 / 약지 보정
                     is_ext[i] = fsi_infos[i] >= judgement
 
-                for finger, fsi, ext in zip(fingers, fsi_infos, is_ext):
-                    print(f"{finger:6} = {fsi:.4f} {ext}")
+                if DEBUG_MODE:
+                    for finger, fsi, ext in zip(FINGERS, fsi_infos, is_ext):
+                        print(f"{finger:6} = {fsi:.4f} {ext}")
 
                 #for iex in is_ext: 해보니까 그냥 억지 연산량만 늘어남
                 #    if iex:
@@ -223,27 +228,21 @@ while True:
 
                 # 아두이노 전송
                 if (IS_CONNECTED):
-                    send(is_ext)
+                    send_finger_data(is_ext)
 
                 # for j, landmark in enumerate(hand): 손 마디 별 루프
 
                 # 인식 확인하기용 카메라에 등장하는 박스
-                lm_boxes = [4, 8, 12, 16, 20]
                 height, width = frame.shape[:2]
-                for lm in lm_boxes:
+                for lm in LM_BOXES:
                     x = int(hand[lm].x * width)
                     y = int(hand[lm].y * height)
-                    j = 0
-                    color = [[0, 255, 0], [0, 0, 255]] # GREEN / RED
 
-                    res = ["EXTENDED", "BENT"]
-                    if is_ext[int((lm / 4) - 1)]:
-                        j = 0
-                    else:
-                        j = 1
+                    idx = lm // 4 - 1
+                    j = 0 if is_ext[idx] else 1
 
                     (text_w, text_h), baseline = cv2.getTextSize(
-                        res[j],
+                        RESULT_TEXT[j],
                         cv2.FONT_HERSHEY_SIMPLEX,
                         0.5,
                         1
@@ -257,14 +256,14 @@ while True:
                     x2 = x + text_w + padding
                     y2 = y
 
-                    cv2.rectangle(frame, (x1, y1), (x2, y2), color[j], 2)
+                    cv2.rectangle(frame, (x1, y1), (x2, y2), COLORS[j], 2)
                     cv2.putText(
                         frame,
-                        res[j],
+                        RESULT_TEXT[j],
                         (x, y - baseline - padding),
                         cv2.FONT_HERSHEY_SIMPLEX,
                         0.5,
-                        color[j],
+                        COLORS[j],
                         1
                     )
 
