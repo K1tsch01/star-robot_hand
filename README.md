@@ -80,8 +80,6 @@ python main.py
 
 ## 문제 해결(Troubleshooting)
 
-여기에는 자주 생기는 오류를 하나씩 적어두면 좋아.
-
 * `ModuleNotFoundError`
 
   * `pip install ~` 로 시작하는 두 명령어를 다시 실행하세요.
