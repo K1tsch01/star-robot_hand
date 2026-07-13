@@ -12,8 +12,6 @@ judgement = 0.95
 PINKY_JUDGEMENT = 0.03 # 소지 보정 값 (x5)
 THUMB_JUDGEMENT = 0.03 # 엄지 보정 값 (x5)
 
-
-
 # 모델 로드
 base_options = python.BaseOptions(
     model_asset_path="hand_landmarker.task"
