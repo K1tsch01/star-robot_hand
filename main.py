@@ -16,7 +16,7 @@ THUMB_JUDGEMENT = 0.07 # 엄지 보정 값
 FINGERS = ("Thumb", "Index", "Middle", "Ring", "Pinky")
 LM_BOXES = (4, 8, 12, 16, 20)
 RESULT_TEXT = ("EXTENDED", "BENT")
-COLORS = (
+COLORS = ( # BGR. RGB 반대 (BLUE, GREEN, RED)
     (0, 255, 0),
     (0, 0, 255)
 )
