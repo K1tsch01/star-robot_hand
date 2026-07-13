@@ -9,8 +9,8 @@ from mediapipe.tasks.python import vision
 
 # !! 판정 !!
 judgement = 0.925
-PINKY_JUDGEMENT = 0.03 # 소지 보정 값 (x5)
-THUMB_JUDGEMENT = 0.07 # 엄지 보정 값 (x5)
+PINKY_JUDGEMENT = 0.03 # 소지 보정 값
+THUMB_JUDGEMENT = 0.07 # 엄지 보정 값 
 
 # 상수들
 FINGERS = ("Thumb", "Index", "Middle", "Ring", "Pinky")
