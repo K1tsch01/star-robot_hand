@@ -9,8 +9,8 @@ from mediapipe.tasks.python import vision
 
 # !! 판정 !!
 judgement = 0.95
-PINKY_JUDGEMENT = 0.03 # 소지 보정 값
-THUMB_JUDGEMENT = 0.03 # 엄지 보정 값
+PINKY_JUDGEMENT = 0.03 # 소지 보정 값 (x5)
+THUMB_JUDGEMENT = 0.03 # 엄지 보정 값 (x5)
 
 
 
@@ -117,7 +117,13 @@ def getFSI(
     return score
 
 # 아두이노 통신
-ser = serial.Serial("COM9", 9600)
+try:
+    ser = serial.Serial("COM9", 9600)
+    IS_CONNECTED = True
+except:
+    IS_CONNECTED = False
+    print("아두이노 연결에 실패했습니다. 포트를 확인해주세요.\n카메라 모드로 전환됩니다.")
+    
 def send(arr: list[bool]):
     DATA = ""
     if len(arr) != 5:
@@ -150,8 +156,8 @@ while True:
 
     if result.hand_landmarks:
 
-        print("=" * 40)
-        print(f"손 개수 : {len(result.hand_landmarks)}")
+        # print("=" * 40)
+        # print(f"손 개수 : {len(result.hand_landmarks)}")
         if len(result.hand_landmarks) > 1:
             print('현재 2개 이상의 손이 감지되었습니다 하나의 손만 감지시켜주세요!')
 
@@ -211,14 +217,15 @@ while True:
                 for finger, fsi, ext in zip(fingers, fsi_infos, is_ext):
                     print(f"{finger:6} = {fsi:.4f} {ext}")
 
-                for iex in is_ext:
-                    if iex:
-                        print("■", end="")
-                    else:
-                        print("□", end="")
+                #for iex in is_ext: 해보니까 그냥 억지 연산량만 늘어남
+                #    if iex:
+                #        print("■", end="")
+                #    else:
+                #        print("□", end="")
 
                 # 아두이노 전송
-                send(is_ext)
+                if (IS_CONNECTED):
+                    send(is_ext)
 
                 # for j, landmark in enumerate(hand): 손 마디 별 루프
 
