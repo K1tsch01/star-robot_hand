@@ -10,7 +10,7 @@ from mediapipe.tasks.python import vision
 # !! 판정 !!
 judgement = 0.925
 PINKY_JUDGEMENT = 0.03 # 소지 보정 값 (x5)
-THUMB_JUDGEMENT = 0.03 # 엄지 보정 값 (x5)
+THUMB_JUDGEMENT = 0.07 # 엄지 보정 값 (x5)
 
 # 상수들
 FINGERS = ("Thumb", "Index", "Middle", "Ring", "Pinky")
@@ -140,6 +140,14 @@ def send_finger_data(arr: list[bool]):
         DATA = "".join("1" if ar else "0" for ar in arr)
         ser.write((DATA + "\n").encode())
 
+print("디버깅 모드를 실행할까요? (y/n)\n> ", end="")
+kotae = input()
+if (kotae == "y") or (kotae == "n"):
+    DEBUG_MODE = True if (kotae=="y") else False
+else:
+    print("잘못된 값을 입력하셨습니다.")
+    exit(0)
+
 # 메인 루프
 while True:
 
@@ -212,13 +220,17 @@ while True:
                 for i in range(5):
                     arg = i * 4
                     fsi_infos[i] = getFSI(hand[arg + 1], hand[arg + 2], hand[arg + 3], hand[arg + 4])
-                    fsi_infos[0] += THUMB_JUDGEMENT
-                    fsi_infos[4] += PINKY_JUDGEMENT # 엄지 / 약지 보정
+
+                fsi_infos[0] += THUMB_JUDGEMENT
+                fsi_infos[4] += PINKY_JUDGEMENT # 엄지 / 약지 보정
+
+                for i in range(5):
                     is_ext[i] = fsi_infos[i] >= judgement
 
                 if DEBUG_MODE:
                     for finger, fsi, ext in zip(FINGERS, fsi_infos, is_ext):
                         print(f"{finger:6} = {fsi:.4f} {ext}")
+                    print()
 
                 #for iex in is_ext: 해보니까 그냥 억지 연산량만 늘어남
                 #    if iex:
