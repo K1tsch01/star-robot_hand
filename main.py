@@ -8,11 +8,13 @@ from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 
 # !! 판정 !!
-judgement = 0.925
+HIGH_JUDGEMENT = 0.925
+LOW_JUDGEMENT = 0.88
 PINKY_JUDGEMENT = 0.03 # 소지 보정 값
 THUMB_JUDGEMENT = 0.07 # 엄지 보정 값 
 
 # 상수들
+PREV_FINGERS = [True] * 5
 FINGERS = ("Thumb", "Index", "Middle", "Ring", "Pinky")
 LM_BOXES = (4, 8, 12, 16, 20)
 RESULT_TEXT = ("EXTENDED", "BENT")
@@ -72,11 +74,16 @@ def normalize(v):
         v[2] / l
     )
 
-def is_extended(FSI_SCORE):
-    if FSI_SCORE > judgement:
-        return True
-    else:
-        return False
+def is_extended(PREV , NOW: list[float]):
+    boolean_now = [False] * 5
+    for i in range(len(NOW)):
+        if NOW[i] > HIGH_JUDGEMENT:
+            boolean_now[i] = True
+        elif NOW[i] < LOW_JUDGEMENT:
+            boolean_now[i] = False
+        else:
+            boolean_now[i] = PREV[i]
+    return boolean_now
 
 def getFSI(
         p1: NormalizedLandmark,
@@ -223,9 +230,8 @@ while True:
 
                 fsi_infos[0] += THUMB_JUDGEMENT
                 fsi_infos[4] += PINKY_JUDGEMENT # 엄지 / 약지 보정
-
-                for i in range(5):
-                    is_ext[i] = fsi_infos[i] >= judgement
+                
+                is_ext = is_extended(PREV_FINGERS , fsi_infos)
 
                 if DEBUG_MODE:
                     for finger, fsi, ext in zip(FINGERS, fsi_infos, is_ext):
@@ -237,9 +243,19 @@ while True:
                 #        print("■", end="")
                 #    else:
                 #        print("□", end="")
+                
+                # 이전 동작이랑 같은지 확인
+                need_2_send = False
+                for i in range(5):
+                    if PREV_FINGERS[i] != is_ext[i]:
+                        need_2_send = True
+                        break
+
+                # PREV_FINGERS에 덮어씌우기
+                PREV_FINGERS = is_ext.copy()
 
                 # 아두이노 전송
-                if (IS_CONNECTED):
+                if IS_CONNECTED and need_2_send:
                     send_finger_data(is_ext)
 
                 # for j, landmark in enumerate(hand): 손 마디 별 루프
