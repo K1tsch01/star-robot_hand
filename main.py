@@ -15,6 +15,7 @@ THUMB_JUDGEMENT = 0.07 # 엄지 보정 값
 
 # 상수들
 PREV_FINGERS = [True] * 5
+PREV_ROTATION = 0
 FINGERS = ("Thumb", "Index", "Middle", "Ring", "Pinky")
 LM_BOXES = (4, 8, 12, 16, 20)
 RESULT_TEXT = ("EXTENDED", "BENT")
@@ -133,18 +134,19 @@ def getFSI(
 
 # 아두이노 통신
 try:
-    ser = serial.Serial("COM9", 9600)
+    ser = serial.Serial("COM10", 9600)
     IS_CONNECTED = True
 except Exception:
     IS_CONNECTED = False
     print("아두이노 연결에 실패했습니다. 포트를 확인해주세요.\n카메라 모드로 전환됩니다.")
     
-def send_finger_data(arr: list[bool]):
+def send_finger_data(arr: list[bool], wrist: int):
     if len(arr) != 5:
         print("아두이노 통신 함수 오류")
         exit(0)
     else:
         DATA = "".join("1" if ar else "0" for ar in arr)
+        DATA += str(wrist)
         ser.write((DATA + "\n").encode())
 
 print("디버깅 모드를 실행할까요? (y/n)\n> ", end="")
@@ -221,6 +223,12 @@ while True:
 
                 # print(f"\n손 {i}")
                 
+                CENTER = hand[0].x
+                rotation = int(CENTER * 180)
+                rotation = max(20, min(160, rotation))
+
+                # 0은 정지, 1은 오른쪽으로, 2는 왼쪽으로.
+
                 fsi_infos = [0.0] * 5
                 is_ext = [False] * 5
 
@@ -245,18 +253,25 @@ while True:
                 #        print("□", end="")
                 
                 # 이전 동작이랑 같은지 확인
-                need_2_send = False
+                need_2_send = (
+                    PREV_FINGERS != is_ext
+                    or rotation != PREV_ROTATION
+                )
                 for i in range(5):
                     if PREV_FINGERS[i] != is_ext[i]:
-                        need_2_send = True
                         break
 
-                # PREV_FINGERS에 덮어씌우기
+                # PREV_FINGERS / PREV ROTATION에 덮어씌우기
                 PREV_FINGERS = is_ext.copy()
-
+                PREV_ROTATION = rotation
+                
                 # 아두이노 전송
                 if IS_CONNECTED and need_2_send:
-                    send_finger_data(is_ext)
+                    if len(str(rotation)) == 1:
+                        rt = "00" + str(rotation)
+                    if len(str(rotation)) == 2:
+                        rt = "0" + str(rotation)
+                    send_finger_data(is_ext, rt)
 
                 # for j, landmark in enumerate(hand): 손 마디 별 루프
 
