@@ -14,8 +14,8 @@ PINKY_JUDGEMENT = 0.03 # 소지 보정 값
 THUMB_JUDGEMENT = 0.07 # 엄지 보정 값 
 
 # 상수들
+PREV_WRIST = True
 PREV_FINGERS = [True] * 5
-PREV_ROTATION = 0
 FINGERS = ("Thumb", "Index", "Middle", "Ring", "Pinky")
 LM_BOXES = (4, 8, 12, 16, 20)
 RESULT_TEXT = ("EXTENDED", "BENT")
@@ -48,9 +48,14 @@ print("ESC를 누르면 종료됩니다.")
 
 # 손목 판별
 def isFront(P: NormalizedLandmark, T: NormalizedLandmark, W: NormalizedLandmark):
-    print("∆x = " + str((P.x - T.x)))
+    dx = P.x - T.x
     m_y = (P.y + T.y)/2
-    print("∆y = " + str((m_y - W.y)))
+    dy = m_y - W.y
+
+    if (dx > 0) == (dy > 0):
+        return True
+    else:
+        return False
 
 # 손가락 판별
 def dot(v1, v2):
@@ -146,13 +151,13 @@ except Exception:
     IS_CONNECTED = False
     print("아두이노 연결에 실패했습니다. 포트를 확인해주세요.\n카메라 모드로 전환됩니다.")
     
-def send_finger_data(arr: list[bool], wrist: int):
+def send_finger_data(arr: list[bool], wrist: bool):
     if len(arr) != 5:
         print("아두이노 통신 함수 오류")
         exit(0)
     else:
         DATA = "".join("1" if ar else "0" for ar in arr)
-        DATA += str(wrist)
+        DATA += "1" if (wrist) else "0"
         ser.write((DATA + "\n").encode())
 
 print("디버깅 모드를 실행할까요? (y/n)\n> ", end="")
@@ -228,13 +233,8 @@ while True:
             for hand in result.hand_landmarks:
 
                 # print(f"\n손 {i}")
-                
-                CENTER = hand[0].x
-                rotation = int(CENTER * 180)
-                rotation = max(20, min(160, rotation))
 
-                # 0은 정지, 1은 오른쪽으로, 2는 왼쪽으로.
-
+                # 손가락 코드
                 fsi_infos = [0.0] * 5
                 is_ext = [False] * 5
 
@@ -247,11 +247,23 @@ while True:
                 
                 is_ext = is_extended(PREV_FINGERS , fsi_infos)
 
+                # 손목 코드
+                dx = hand[20].x - hand[4].x
+                m_y = (hand[20].y + hand[4].y)/2
+                dy = m_y - hand[0].y
+
+
+                is_front = isFront(hand[20], hand[4], hand[0]) if ((abs(dx) > 0.1) and (abs(dy) > 0)) else PREV_WRIST
+
                 if DEBUG_MODE:
                     for finger, fsi, ext in zip(FINGERS, fsi_infos, is_ext):
                         print(f"{finger:6} = {fsi:.4f} {ext}")
-                    isFront(hand[20], hand[4], hand[0])
+                    print(f"dx = {dx}")
+                    print(f"dy = {dy}")
+                    print(f"is_front = {is_front}")
                     print()
+
+                
 
                 #for iex in is_ext: 해보니까 그냥 억지 연산량만 늘어남
                 #    if iex:
@@ -262,23 +274,16 @@ while True:
                 # 이전 동작이랑 같은지 확인
                 need_2_send = (
                     PREV_FINGERS != is_ext
-                    or rotation != PREV_ROTATION
+                    or is_front != PREV_WRIST
                 )
-                for i in range(5):
-                    if PREV_FINGERS[i] != is_ext[i]:
-                        break
 
                 # PREV_FINGERS / PREV ROTATION에 덮어씌우기
                 PREV_FINGERS = is_ext.copy()
-                PREV_ROTATION = rotation
+                PREV_WRIST = is_front
                 
                 # 아두이노 전송
                 if IS_CONNECTED and need_2_send:
-                    if len(str(rotation)) == 1:
-                        rt = "00" + str(rotation)
-                    if len(str(rotation)) == 2:
-                        rt = "0" + str(rotation)
-                    send_finger_data(is_ext, rt)
+                    send_finger_data(is_ext, is_front)
 
                 # for j, landmark in enumerate(hand): 손 마디 별 루프
 
