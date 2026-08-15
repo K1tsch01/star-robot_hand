@@ -46,6 +46,12 @@ if not cap.isOpened():
 
 print("ESC를 누르면 종료됩니다.")
 
+# 손목 판별
+def isFront(P: NormalizedLandmark, T: NormalizedLandmark, W: NormalizedLandmark):
+    print("∆x = " + str((P.x - T.x)))
+    m_y = (P.y + T.y)/2
+    print("∆y = " + str((m_y - W.y)))
+
 # 손가락 판별
 def dot(v1, v2):
     return (
