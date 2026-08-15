@@ -250,6 +250,7 @@ while True:
                 if DEBUG_MODE:
                     for finger, fsi, ext in zip(FINGERS, fsi_infos, is_ext):
                         print(f"{finger:6} = {fsi:.4f} {ext}")
+                    isFront(hand[20], hand[4], hand[0])
                     print()
 
                 #for iex in is_ext: 해보니까 그냥 억지 연산량만 늘어남
