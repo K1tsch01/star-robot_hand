@@ -260,8 +260,8 @@ while True:
                 if DEBUG_MODE:
                     for finger, fsi, ext in zip(FINGERS, fsi_infos, is_ext):
                         print(f"{finger:6} = {fsi:.4f} {ext}")
-                    print(f"dx = {dx}")
-                    print(f"dy = {dy}")
+                    print(f"dx = {dx:.4f}")
+                    print(f"dy = {dy:.4f}")
                     print(f"is_front = {is_front}")
                     print(f"handedness = {handedness}")
                     print()
