@@ -251,9 +251,10 @@ while True:
                 dx = hand[20].x - hand[4].x
                 m_y = (hand[20].y + hand[4].y)/2
                 dy = m_y - hand[0].y
+                epsilon = 0.1
 
 
-                is_front = isFront(hand[20], hand[4], hand[0]) if ((abs(dx) > 0.1) and (abs(dy) > 0)) else PREV_WRIST
+                is_front = isFront(hand[20], hand[4], hand[0]) if ((abs(dx) > epsilon) and (abs(dy) > epsilon)) else PREV_WRIST
 
                 if DEBUG_MODE:
                     for finger, fsi, ext in zip(FINGERS, fsi_infos, is_ext):
