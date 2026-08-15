@@ -11,7 +11,7 @@ from mediapipe.tasks.python import vision
 HIGH_JUDGEMENT = 0.925
 LOW_JUDGEMENT = 0.88
 PINKY_JUDGEMENT = 0.03 # 소지 보정 값
-THUMB_JUDGEMENT = 0.07 # 엄지 보정 값 
+THUMB_JUDGEMENT = 0.05 # 엄지 보정 값 
 
 # 상수들
 PREV_WRIST = True
