@@ -253,7 +253,6 @@ while True:
                 dy = m_y - hand[0].y
                 epsilon = 0.1
 
-
                 is_front = isFront(hand[20], hand[4], hand[0]) if ((abs(dx) > epsilon) and (abs(dy) > epsilon)) else PREV_WRIST
 
                 if DEBUG_MODE:
@@ -320,6 +319,48 @@ while True:
                         cv2.FONT_HERSHEY_SIMPLEX,
                         0.5,
                         COLORS[j],
+                        1
+                    )
+
+                    # 손목 정보 박스
+                    wrist = hand[0]
+
+                    x = int(wrist.x * width)
+                    y = int(wrist.y * height)
+
+                    wrist_text = "FRONT" if is_front else "BACK"
+                    wrist_color = (0, 255, 0) if is_front else (0, 0, 255)
+
+                    (text_w, text_h), baseline = cv2.getTextSize(
+                        wrist_text,
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        0.5,
+                        1
+                    )
+
+                    padding = 5
+
+                    # 손목 위쪽에 박스
+                    x1 = x - text_w // 2 - padding
+                    y1 = y - text_h - baseline - padding * 2
+                    x2 = x + text_w // 2 + padding
+                    y2 = y
+
+                    cv2.rectangle(
+                        frame,
+                        (x1, y1),
+                        (x2, y2),
+                        wrist_color,
+                        2
+                    )
+
+                    cv2.putText(
+                        frame,
+                        wrist_text,
+                        (x - text_w // 2, y - baseline - padding),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        0.5,
+                        wrist_color,
                         1
                     )
 
