@@ -47,7 +47,7 @@ void loop() {
     }
 
     for (int i = 0; i < 6; i++) {
-      servos[i].write(fingers[i] ? 180 : 0);
+      servos[i].write(datas[i] ? 180 : 0);
     }
     delay(20);
   } 

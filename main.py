@@ -264,6 +264,7 @@ while True:
                     print(f"dy = {dy:.4f}")
                     print(f"is_front = {is_front}")
                     print(f"handedness = {handedness}")
+                    print(f"pos of wrist = ({hand[0].x:.4f} , {hand[0].y:.4f})")
                     print()
 
                 
