@@ -153,7 +153,7 @@ def getFSI(
 
 # 아두이노 통신
 try:
-    ser = serial.Serial("COM9", 9600)
+    ser = serial.Serial("COM10", 9600)
     IS_CONNECTED = True
 except Exception:
     IS_CONNECTED = False
@@ -263,6 +263,8 @@ while True:
                 handedness = result.handedness[0][0].category_name
 
                 is_front = isFront(hand[20], hand[4], hand[0], handedness, (abs(dx) > epsilon) and (abs(dy) > epsilon))
+
+            
 
                 if DEBUG_MODE:
                     for finger, fsi, ext in zip(FINGERS, fsi_infos, is_ext):
