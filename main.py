@@ -11,7 +11,8 @@ from mediapipe.tasks.python import vision
 HIGH_JUDGEMENT = 0.925
 LOW_JUDGEMENT = 0.88
 PINKY_JUDGEMENT = 0.03 # 소지 보정 값
-THUMB_JUDGEMENT = 0.05 # 엄지 보정 값 
+THUMB_JUDGEMENT = 0.05 # 엄지 보정 값
+epsilon = 0.2
 
 # 상수들
 PREV_WRIST = True
@@ -47,10 +48,17 @@ if not cap.isOpened():
 print("ESC를 누르면 종료됩니다.")
 
 # 손목 판별
-def isFront(P: NormalizedLandmark, T: NormalizedLandmark, W: NormalizedLandmark, LR: str):
-    dx = P.x - T.x if (LR == "Right") else T.x - P.x
-    m_y = (P.y + T.y)/2
-    dy = m_y - W.y
+def isFront(P: NormalizedLandmark, T: NormalizedLandmark, W: NormalizedLandmark, LR: str, passes: bool):
+    if passes:
+        dx = P.x - T.x if (LR == "Right") else T.x - P.x
+        m_y = (P.y + T.y)/2
+        dy = m_y - W.y
+    else:
+        dx = P.y - T.y if (LR == "Right") else T.y - P.y # dx > 0
+        m_x = (P.x + T.x)/2
+        dy = W.x - m_x
+        if abs(dx) < epsilon and abs(dy) < epsilon:
+            return PREV_WRIST
 
     if (dx > 0) == (dy > 0):
         return True
@@ -252,10 +260,9 @@ while True:
                 dx = hand[20].x - hand[4].x
                 m_y = (hand[20].y + hand[4].y)/2
                 dy = m_y - hand[0].y
-                epsilon = 0.1
                 handedness = result.handedness[0][0].category_name
 
-                is_front = isFront(hand[20], hand[4], hand[0], handedness) if ((abs(dx) > epsilon) and (abs(dy) > epsilon)) else PREV_WRIST
+                is_front = isFront(hand[20], hand[4], hand[0], handedness, (abs(dx) > epsilon) and (abs(dy) > epsilon))
 
                 if DEBUG_MODE:
                     for finger, fsi, ext in zip(FINGERS, fsi_infos, is_ext):
