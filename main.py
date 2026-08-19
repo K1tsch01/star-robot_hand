@@ -12,7 +12,9 @@ HIGH_JUDGEMENT = 0.925
 LOW_JUDGEMENT = 0.88
 PINKY_JUDGEMENT = 0.03 # 소지 보정 값
 THUMB_JUDGEMENT = 0.05 # 엄지 보정 값
-epsilon = 0.2
+epsilon_k = 0.2
+epsilon = 0
+S0 = 0.05
 
 # 상수들
 PREV_WRIST = True
@@ -48,12 +50,17 @@ if not cap.isOpened():
 print("ESC를 누르면 종료됩니다.")
 
 # 손목 판별
-def isFront(P: NormalizedLandmark, T: NormalizedLandmark, W: NormalizedLandmark, LR: str, passes: bool):
-    if passes:
-        dx = P.x - T.x if (LR == "Right") else T.x - P.x
-        m_y = (P.y + T.y)/2
-        dy = m_y - W.y
-    else:
+def isFront(P: NormalizedLandmark, T: NormalizedLandmark, W: NormalizedLandmark, LR: str, Sn):
+
+    global epsilon
+    dx = P.x - T.x if (LR == "Right") else T.x - P.x
+    m_y = (P.y + T.y)/2
+    dy = m_y - W.y
+    epsilon = (epsilon_k * Sn) / S0
+
+    passes = (abs(dx) > epsilon) and (abs(dy) > epsilon)
+
+    if not passes:
         dx = P.y - T.y if (LR == "Right") else T.y - P.y # dx > 0
         m_x = (P.x + T.x)/2
         dy = W.x - m_x
@@ -197,7 +204,7 @@ while True:
 
         # print("=" * 40)
         # print(f"손 개수 : {len(result.hand_landmarks)}")
-        if len(result.hand_landmarks) > 1:
+        if len(result.hand_landmarks) > 3:
             print('현재 2개 이상의 손이 감지되었습니다 하나의 손만 감지시켜주세요!')
 
             height, width = frame.shape[:2]
@@ -262,11 +269,14 @@ while True:
                 dy = m_y - hand[0].y
                 handedness = result.handedness[0][0].category_name
 
-                is_front = isFront(hand[20], hand[4], hand[0], handedness, (abs(dx) > epsilon) and (abs(dy) > epsilon))
+                S_n = ( math.sqrt( (hand[0].x - hand[9].x)**2 + (hand[0].y - hand[9].y)**2 ) ) * ( math.sqrt( (hand[1].x - hand[17].x)**2 + (hand[1].y - hand[17].y)**2 ) )
+
+                is_front = isFront(hand[20], hand[4], hand[0], handedness, S_n)
 
             
 
                 if DEBUG_MODE:
+                    print()
                     for finger, fsi, ext in zip(FINGERS, fsi_infos, is_ext):
                         print(f"{finger:6} = {fsi:.4f} {ext}")
                     print(f"dx = {dx:.4f}")
@@ -274,7 +284,9 @@ while True:
                     print(f"is_front = {is_front}")
                     print(f"handedness = {handedness}")
                     print(f"pos of wrist = ({hand[0].x:.4f} , {hand[0].y:.4f})")
-                    print()
+                    print(f"S_n = {S_n}")
+                    print(f"epsilon : {epsilon}")
+                    print(f"Sn / S0 = {S_n / S0}")
 
                 
 
