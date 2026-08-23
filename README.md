@@ -2,8 +2,7 @@
 Made by STAR, 2026
 
 혹여 본 코드 작성에 사용된 수학적 로직이 궁금하신가요?
-손목 관련 로직은 [여기](https://app.notion.com/p/3bc8a37f15d080608172f51299174324?source=copy_link)를 눌러주세요!
-(손가락은 추후 작성 예정)
+알고리즘 문서를 확인하려면 [여기](https://app.notion.com/p/3bc8a37f15d080069922dde8b0f125d8?source=copy_link)를 눌러주세요!
 
 ## 1. 다운로드
 

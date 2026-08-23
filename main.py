@@ -259,7 +259,7 @@ while True:
                     fsi_infos[i] = getFSI(hand[arg + 1], hand[arg + 2], hand[arg + 3], hand[arg + 4])
 
                 fsi_infos[0] += THUMB_JUDGEMENT
-                fsi_infos[4] += PINKY_JUDGEMENT # 엄지 / 약지 보정
+                fsi_infos[4] += PINKY_JUDGEMENT # 엄지 / 소지 보정
                 
                 is_ext = is_extended(PREV_FINGERS , fsi_infos)
 
@@ -284,9 +284,9 @@ while True:
                     print(f"is_front = {is_front}")
                     print(f"handedness = {handedness}")
                     print(f"pos of wrist = ({hand[0].x:.4f} , {hand[0].y:.4f})")
-                    print(f"S_n = {S_n}")
-                    print(f"epsilon : {epsilon}")
-                    print(f"Sn / S0 = {S_n / S0}")
+                    print(f"S_n = {S_n:.4f}")
+                    print(f"dynamic-ε : {epsilon:.4f}")
+                    print(f"Sn / S0 = x{S_n / S0:.4f}")
 
                 
 
