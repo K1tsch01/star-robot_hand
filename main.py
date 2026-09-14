@@ -14,7 +14,7 @@ PINKY_JUDGEMENT = 0.03 # 소지 보정 값
 THUMB_JUDGEMENT = 0.05 # 엄지 보정 값
 epsilon_k = 0.2
 epsilon = 0
-S0 = 0.05
+S0 = 0.05 # 0.05
 
 # 상수들
 PREV_WRIST = True
@@ -61,9 +61,9 @@ def isFront(P: NormalizedLandmark, T: NormalizedLandmark, W: NormalizedLandmark,
     passes = (abs(dx) > epsilon) and (abs(dy) > epsilon)
 
     if not passes:
-        dx = P.y - T.y if (LR == "Right") else T.y - P.y # dx > 0
+        dy = P.y - T.y if (LR == "Right") else T.y - P.y # dx > 0
         m_x = (P.x + T.x)/2
-        dy = W.x - m_x
+        dx = W.x - m_x
         if abs(dx) < epsilon and abs(dy) < epsilon:
             return PREV_WRIST
 
@@ -204,7 +204,7 @@ while True:
 
         # print("=" * 40)
         # print(f"손 개수 : {len(result.hand_landmarks)}")
-        if len(result.hand_landmarks) > 3:
+        if len(result.hand_landmarks) > 2:
             print('현재 2개 이상의 손이 감지되었습니다 하나의 손만 감지시켜주세요!')
 
             height, width = frame.shape[:2]

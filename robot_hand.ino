@@ -27,6 +27,13 @@ void loop() {
 
     same = true;
     bool datas[6];
+    if (datas[3] || datas[4]) {
+      datas[3] = true;
+      datas[4] = true;
+    } else {
+      datas[3] = false;
+      datas[4] = false;
+    }
     
     // 이전 꺼랑 같은지 비교
     for (int i = 0; i < 6; i++) {
