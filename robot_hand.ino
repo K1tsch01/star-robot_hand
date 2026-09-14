@@ -1,14 +1,17 @@
+
 #include <Servo.h>
 
-
 Servo servos[6];
-// 순서대로, 엄 검 중 약 소 / 손목(NNN) 근데 손목은 쓸지 안쓸지 모르겠음...
+
+// 0 - 엄지
+// 1 - 엄지 관절
+// 2 - 검지
+// 3 - 중지
+// 4 - 약지 / 소지
+// 5 - 손목
 int pins[6] = {3, 5, 6, 9, 10, 11};
-bool prev_datas[6] = {false, false, false, false, false , false};
-bool same;
 
 void setup() {
-  // 서보 모터 전부 활성화
   for (int i = 0; i < 6; i++) {
     servos[i].attach(pins[i]);
   }
@@ -17,45 +20,48 @@ void setup() {
 }
 
 void loop() {
-  if (Serial.available()) {
+  if (!Serial.available()) {
+    return;
+  }
 
-    String data = Serial.readStringUntil('\n');
+  String data = Serial.readStringUntil('\n');
 
-    if (data.length() != 6) {
-      return;
-    }
+  // [엄][검][중][약][소][손목]
+  if (data.length() != 6) {
+    return;
+  }
 
-    same = true;
-    bool datas[6];
-    if (datas[3] || datas[4]) {
-      datas[3] = true;
-      datas[4] = true;
-    } else {
-      datas[3] = false;
-      datas[4] = false;
-    }
-    
-    // 이전 꺼랑 같은지 비교
-    for (int i = 0; i < 6; i++) {
-      datas[i] = (data[i] == '1');
-      if (prev_datas[i] != datas[i]) {
-        same = false;
-      }
-    }
+  // 입력 데이터
+  bool thumb  = (data[0] == '1');
+  bool index  = (data[1] == '1');
+  bool middle = (data[2] == '1');
+  bool ring   = (data[3] == '1');
+  bool pinky  = (data[4] == '1');
+  bool wrist  = (data[5] == '1');
 
-    // 같으면 더 연산 안함
-    if (same) {
-      return;
-    }
+  // =================================
+  // 서보 제어
+  // =================================
 
-    // 비교 대상 갱신
-    for (int i = 0; i < 6; i++) {
-      prev_datas[i] = datas[i];
-    }
+  // 엄지 관절
+  servos[1].write(thumb ? 180 : 0);
 
-    for (int i = 0; i < 6; i++) {
-      servos[i].write(datas[i] ? 180 : 0);
-    }
-    delay(20);
-  } 
+  // 엄지
+  servos[0].write(thumb ? 170 : 110);
+
+  // 검지
+  servos[2].write(index ? 180 : 0);
+
+  // 중지
+  servos[3].write(middle ? 180 : 0);
+
+  // 약지 + 소지
+  if (ring && pinky) {
+    servos[4].write(180);
+  } else {
+    servos[4].write(0);
+  }
+
+  // 손목
+  servos[5].write(wrist ? 180 : 0);
 }
