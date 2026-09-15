@@ -15,7 +15,12 @@ void setup() {
   for (int i = 0; i < 6; i++) {
     servos[i].attach(pins[i]);
   }
-
+  servos[0].write(170);
+  servos[1].write(180);
+  servos[2].write(180);
+  servos[3].write(180);
+  servos[4].write(180);
+  servos[5].write(180);
   Serial.begin(9600);
 }
 
@@ -45,16 +50,17 @@ void loop() {
 
   // 엄지 관절
   servos[1].write(thumb ? 180 : 0);
+  delay(10);
 
   // 엄지
-  servos[0].write(thumb ? 170 : 110);
-
+  servos[0].write(thumb ? 170 : 77);
+  delay(10);
   // 검지
   servos[2].write(index ? 180 : 0);
-
+  delay(10);
   // 중지
   servos[3].write(middle ? 180 : 0);
-
+  delay(10);
   // 약지 + 소지
   if (ring && pinky) {
     servos[4].write(180);
@@ -64,4 +70,5 @@ void loop() {
 
   // 손목
   servos[5].write(wrist ? 180 : 0);
+  delay(80);
 }

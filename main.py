@@ -8,10 +8,10 @@ from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 
 # !! 판정 !!
-HIGH_JUDGEMENT = 0.925
-LOW_JUDGEMENT = 0.88
-PINKY_JUDGEMENT = 0.03 # 소지 보정 값
-THUMB_JUDGEMENT = 0.05 # 엄지 보정 값
+HIGH_JUDGEMENT = 0.96
+LOW_JUDGEMENT = 0.93
+PINKY_JUDGEMENT = 0.02 # 소지 보정 값
+THUMB_JUDGEMENT = 0.025 # 엄지 보정 값
 epsilon_k = 0.2
 epsilon = 0
 S0 = 0.05 # 0.05
@@ -204,7 +204,7 @@ while True:
 
         # print("=" * 40)
         # print(f"손 개수 : {len(result.hand_landmarks)}")
-        if len(result.hand_landmarks) > 2:
+        if len(result.hand_landmarks) > 1:
             print('현재 2개 이상의 손이 감지되었습니다 하나의 손만 감지시켜주세요!')
 
             height, width = frame.shape[:2]
@@ -271,7 +271,7 @@ while True:
 
                 S_n = ( math.sqrt( (hand[0].x - hand[9].x)**2 + (hand[0].y - hand[9].y)**2 ) ) * ( math.sqrt( (hand[1].x - hand[17].x)**2 + (hand[1].y - hand[17].y)**2 ) )
 
-                is_front = isFront(hand[20], hand[4], hand[0], handedness, S_n)
+                is_front = isFront(hand[19], hand[3], hand[0], handedness, S_n)
 
             
 
