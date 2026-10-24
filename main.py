@@ -29,6 +29,14 @@ COLORS = ( # BGR. RGB 반대 (BLUE, GREEN, RED)
 )
 DEBUG_MODE = False
 
+print("디버깅 모드를 실행할까요? (y/n)\n> ", end="")
+kotae = input()
+if (kotae == "y") or (kotae == "n"):
+    DEBUG_MODE = True if (kotae=="y") else False
+else:
+    print("잘못된 값을 입력하셨습니다.")
+    exit(0)
+
 # 모델 로드
 base_options = python.BaseOptions(
     model_asset_path="hand_landmarker.task"
@@ -187,14 +195,6 @@ def send_finger_data(arr: list[bool], wrist: bool):
         DATA = "".join("1" if ar else "0" for ar in arr)
         DATA += "1" if (wrist) else "0"
         ser.write((DATA + "\n").encode())
-
-print("디버깅 모드를 실행할까요? (y/n)\n> ", end="")
-kotae = input()
-if (kotae == "y") or (kotae == "n"):
-    DEBUG_MODE = True if (kotae=="y") else False
-else:
-    print("잘못된 값을 입력하셨습니다.")
-    exit(0)
 
 # 메인 루프
 while True:
