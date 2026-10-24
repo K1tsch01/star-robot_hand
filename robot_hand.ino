@@ -15,7 +15,7 @@ void setup() {
   for (int i = 0; i < 6; i++) {
     servos[i].attach(pins[i]);
   }
-  servos[0].write(170);
+  servos[0].write(90);
   servos[1].write(180);
   servos[2].write(180);
   servos[3].write(180);
@@ -53,7 +53,7 @@ void loop() {
   delay(10);
 
   // 엄지
-  servos[0].write(thumb ? 170 : 77);
+  servos[0].write(thumb ? 90 : 0);
   delay(10);
   // 검지
   servos[2].write(index ? 180 : 0);
