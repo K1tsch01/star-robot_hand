@@ -2,6 +2,7 @@ import cv2
 import mediapipe as mp
 import math
 import serial
+import numpy as np
 
 from mediapipe.tasks.python.components.containers.landmark import NormalizedLandmark
 from mediapipe.tasks import python
@@ -41,26 +42,22 @@ options = vision.HandLandmarkerOptions(
 detector = vision.HandLandmarker.create_from_options(options)
 
 # 웹캠
-
-# 웹캠
 cap = cv2.VideoCapture(0)
 
 if not cap.isOpened():
     print("카메라를 열 수 없습니다.")
     exit()
 
-# 카메라의 원본 해상도 확인
-cam_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-cam_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+# 원본 카메라 해상도
+CAM_W = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+CAM_H = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-# 창 크기 배율
-SCALE = 1.5
-
+# 전체화면 창
 cv2.namedWindow("Camera", cv2.WINDOW_NORMAL)
-cv2.resizeWindow(
+cv2.setWindowProperty(
     "Camera",
-    int(cam_width * SCALE),
-    int(cam_height * SCALE)
+    cv2.WND_PROP_FULLSCREEN,
+    cv2.WINDOW_FULLSCREEN
 )
 
 print("ESC를 누르면 종료됩니다.")
@@ -405,9 +402,30 @@ while True:
                         1
                     )
 
+    
+    
+    # 검은색 배경 위에 카메라 영상 배치
+    SCREEN_W = 1920
+    SCREEN_H = 1200
 
+    canvas = np.zeros((SCREEN_H, SCREEN_W, 3), dtype=np.uint8)
 
-    cv2.imshow("Camera", frame)
+    # 영상 비율 유지하면서 가능한 한 크게 확대
+    height, width = frame.shape[:2]
+    scale = min(SCREEN_W / width, SCREEN_H / height)
+
+    new_w = int(width * scale)
+    new_h = int(height * scale)
+
+    resized = cv2.resize(frame, (new_w, new_h))
+
+    # 중앙 정렬
+    x = (SCREEN_W - new_w) // 2
+    y = (SCREEN_H - new_h) // 2
+
+    canvas[y:y + new_h, x:x + new_w] = resized
+
+    cv2.imshow("Camera", canvas)
 
     if cv2.waitKey(1) == 27:
         break
