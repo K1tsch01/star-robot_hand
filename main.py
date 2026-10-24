@@ -42,6 +42,8 @@ detector = vision.HandLandmarker.create_from_options(options)
 
 # 웹캠
 cap = cv2.VideoCapture(0)
+cv2.namedWindow("Camera", cv2.WINDOW_NORMAL)
+cv2.resizeWindow("Camera", 1280, 720)
 
 if not cap.isOpened():
     print("카메라를 열 수 없습니다.")
