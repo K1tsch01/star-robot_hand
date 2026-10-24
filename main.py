@@ -41,13 +41,27 @@ options = vision.HandLandmarkerOptions(
 detector = vision.HandLandmarker.create_from_options(options)
 
 # 웹캠
+
+# 웹캠
 cap = cv2.VideoCapture(0)
-cv2.namedWindow("Camera", cv2.WINDOW_NORMAL)
-cv2.resizeWindow("Camera", 1280, 720)
 
 if not cap.isOpened():
     print("카메라를 열 수 없습니다.")
     exit()
+
+# 카메라의 원본 해상도 확인
+cam_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+cam_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+# 창 크기 배율
+SCALE = 1.5
+
+cv2.namedWindow("Camera", cv2.WINDOW_NORMAL)
+cv2.resizeWindow(
+    "Camera",
+    int(cam_width * SCALE),
+    int(cam_height * SCALE)
+)
 
 print("ESC를 누르면 종료됩니다.")
 
